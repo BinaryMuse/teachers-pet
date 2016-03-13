@@ -1,20 +1,40 @@
+fs = require 'fs'
 path = require 'path'
+vm = require 'vm'
+
+coffee = require 'coffee-script'
 
 SpecEnvironment = require './spec-environment'
 SpecReporter = require './spec-reporter'
 SpecRunner = require './spec-runner'
 
-loadSpecFile = (specFile) ->
-  filePath = path.resolve(process.cwd(), specFile)
-  require filePath
+loadSpecFile = (specFile, vmContext) ->
+  filePath = path.resolve(specFile)
+  code = fs.readFileSync(filePath, 'utf8')
+  if path.extname(specFile) is ".coffee"
+    code = coffee.compile(code)
+  script = new vm.Script(code, filename: specFile)
+  script.runInContext vmContext
 
-createGlobals = (env) ->
-  global.describe = env.describe
-  global.xdescribe = env.xdescribe
-  global.it = env.it
-  global.xit = env.xit
-  global.beforeEach = env.beforeEach
-  global.afterEach = env.afterEach
+createContext = (env) ->
+  newExports = {}
+  newModule =
+    exports: newExports
+
+  safeContext = Object.assign {}, global,
+    require: require,
+    exports: newExports,
+    module: newModule,
+
+    describe: env.describe
+    xdescribe: env.xdescribe
+    it: env.it
+    xit: env.xit
+    beforeEach: env.beforeEach
+    afterEach: env.afterEach
+  vm.createContext safeContext
+
+
 
 
 specFiles = process.argv[2...]
@@ -25,13 +45,13 @@ if not specFiles.length
 reporter = new SpecReporter()
 env = new SpecEnvironment(reporter)
 runner = new SpecRunner(env)
-createGlobals(env)
-loadSpecFile spec for spec in specFiles
-code = runner.run
+context = createContext(env)
+loadSpecFile spec, context for spec in specFiles
+exitCode = runner.run
   onSpecPending: reporter.onSpecPending
   onSpecPass: reporter.onSpecPass
   onSpecFail: reporter.onSpecFail
 
 reporter.report(env)
 
-process.exit(code)
+process.exit(exitCode)
