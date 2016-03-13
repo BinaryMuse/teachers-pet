@@ -23,7 +23,9 @@ Spec Descriptions
 The following functions are made available globally:
 
 * `describe` - set up context, useful for describing a group of tests or making them share `beforeEach`/`afterEach` hooks
+* `xdescribe` - like `describe`, but mark all child tests as pending (they will be skipped)
 * `it` - create a test; throw an exception from the test function to make the test fail
+* `xit` - like `it`, but mark the test as pending (it will be skipped)
 * `beforeEach` - run some code before each test
 * `afterEach` - run some code after each test
 
