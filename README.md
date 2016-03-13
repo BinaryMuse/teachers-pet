@@ -3,7 +3,7 @@ Teacher's Pet
 
 > A library for passing all the tests
 
-Teacher's Pet is a small, toy testing framework created with the intention to learn how to build a testing framework. You probably shouldn't use it for real things.
+Teacher's Pet is a small, toy testing framework created with the intent to learn how to build a testing framework. You probably shouldn't use it for real things.
 
 Use
 ---
