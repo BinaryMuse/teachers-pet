@@ -2,40 +2,17 @@ module.exports =
 class Spec
   constructor: (@description, @itFn, @suite, @pending=false) ->
     @ran = false
+    @skipped = false
     @failed = false
     @exception = null
 
-  run: (userEnv) ->
-    if @pending
-      try
-        @suite.env.onSpecPending(this)
-      finally
-        return
-
+  pass: ->
     @ran = true
-    try
-      @runHooks('beforeEach', userEnv)
-      @itFn.call(userEnv)
-      @runHooks('afterEach', userEnv)
-      try
-        @suite.env.onSpecPass(this)
-      finally
-        # nothing
-    catch ex
-      @failed = true
-      @exception = ex
-      try
-        @suite.env.onSpecFail(this)
-      finally
-        # nothing
 
-  runHooks: (hookType, userEnv) ->
-    hooks = []
-    suite = @suite
-    while suite?
-      for hook in suite.hooks[hookType]
-        hooks.unshift(hook)
-      suite = suite.parentSuite
+  fail: (exception) ->
+    @ran = true
+    @failed = true
+    @exception = exception
 
-    for hook in hooks
-      hook.call(userEnv)
+  skip: ->
+    @skipped = true

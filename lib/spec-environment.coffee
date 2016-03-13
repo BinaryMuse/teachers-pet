@@ -8,9 +8,6 @@ class SpecEnvironment
     @rootSuite = new SpecSuite(this, '<root>')
     @currentSuite = @rootSuite
 
-  run: ->
-    @rootSuite.run(@userEnv)
-
   describe: (description, subSuiteFn, pending=false) =>
     currentSuite = @currentSuite
     subSuite = currentSuite.describe description, subSuiteFn, pending

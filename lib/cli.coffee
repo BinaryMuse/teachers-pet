@@ -2,6 +2,7 @@ path = require 'path'
 
 SpecEnvironment = require './spec-environment'
 SpecReporter = require './spec-reporter'
+SpecRunner = require './spec-runner'
 
 loadSpecFile = (specFile) ->
   filePath = path.resolve(process.cwd(), specFile)
@@ -23,9 +24,10 @@ if not specFiles.length
 
 reporter = new SpecReporter()
 env = new SpecEnvironment(reporter)
+runner = new SpecRunner(env)
 createGlobals(env)
 loadSpecFile spec for spec in specFiles
-env.run()
-code = env.report()
+code = runner.run()
+env.report()
 
 process.exit(code)

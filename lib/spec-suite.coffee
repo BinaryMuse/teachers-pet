@@ -11,11 +11,6 @@ class SpecSuite
     @specs = []
     @subSuites = []
 
-  run: (userEnv) ->
-    copyEnv = -> Object.assign({}, userEnv)
-    spec.run(copyEnv()) for spec in @specs
-    suite.run(copyEnv()) for suite in @subSuites
-
   describe: (description, subSuiteFn, pending=false) ->
     subSuite = new SpecSuite(@env, description, this, pending)
     @subSuites.push(subSuite)
