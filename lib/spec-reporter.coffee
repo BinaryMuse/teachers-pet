@@ -78,17 +78,17 @@ class SpecReporter
     for line in lines
       console.log '  ', line
 
-  onSpecPending: ->
+  onSpecPending: =>
     @specCount += 1
     @pendingCount += 1
     process.stdout.write '-'.yellow
 
-  onSpecPass: ->
+  onSpecPass: =>
     @specCount += 1
     @passCount += 1
     process.stdout.write '.'.green
 
-  onSpecFail: (spec) ->
+  onSpecFail: (spec) =>
     @specCount += 1
     @failures.push spec
     process.stdout.write 'F'.red

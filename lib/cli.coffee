@@ -27,7 +27,11 @@ env = new SpecEnvironment(reporter)
 runner = new SpecRunner(env)
 createGlobals(env)
 loadSpecFile spec for spec in specFiles
-code = runner.run()
-env.report()
+code = runner.run
+  onSpecPending: reporter.onSpecPending
+  onSpecPass: reporter.onSpecPass
+  onSpecFail: reporter.onSpecFail
+
+reporter.report(env)
 
 process.exit(code)

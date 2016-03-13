@@ -30,15 +30,3 @@ class SpecEnvironment
 
   afterEach: (afterFn) =>
     @currentSuite.afterEach afterFn
-
-  report: ->
-    @reporter.report(this)
-
-  onSpecPending: (spec) ->
-    @reporter.onSpecPending?(spec)
-
-  onSpecPass: (spec) ->
-    @reporter.onSpecPass?(spec)
-
-  onSpecFail: (spec) ->
-    @reporter.onSpecFail?(spec)

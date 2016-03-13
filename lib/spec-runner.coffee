@@ -2,8 +2,9 @@ module.exports =
 class SpecRunner
   constructor: (@env) ->
     @anyFailed = false
+    @options = {}
 
-  run: ->
+  run: (@options) ->
     suite = @env.rootSuite
     userEnv = @env.userEnv
     @runSuite(suite, userEnv)
@@ -19,7 +20,7 @@ class SpecRunner
     if spec.pending
       spec.skip()
       try
-        spec.suite.env.onSpecPending(spec)
+        @options.onSpecPending?(spec)
       finally
         return
 
@@ -30,11 +31,11 @@ class SpecRunner
       @runHooks(spec, 'afterEach', userEnv)
 
       spec.pass()
-      @executeSafe -> spec.suite.env.onSpecPass(spec)
+      @executeSafe => @options.onSpecPass?(spec)
     catch ex
       @anyFailed = true
       spec.fail(ex)
-      @executeSafe -> spec.suite.env.onSpecFail(spec)
+      @executeSafe => @options.onSpecFail?(spec)
 
   runHooks: (spec, hookType, userEnv) ->
     hooks = []
