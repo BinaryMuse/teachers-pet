@@ -6,7 +6,7 @@ afterEachCount = 0
 describe 'Basic tests', ->
   beforeEach ->
     beforeEachCount += 1
-    @value = 10
+    @value = []
 
   it 'tests things successfully', ->
     assert.equal true, true
@@ -15,17 +15,17 @@ describe 'Basic tests', ->
     assert.equal 1, 1
 
   it 'allows setting on the user env', ->
-    assert.equal @value, 10
+    assert.deepEqual @value, []
 
   describe 'nested tests\' (multiple) beforeEach\'s', ->
-    it 'works as expected', ->
-      assert.equal @value, 40
+    beforeEach ->
+      @value.push('one')
+
+    it 'works as expected and in order', ->
+      assert.deepEqual @value, ['one', 'two']
 
     beforeEach ->
-      @value += 10
-
-    beforeEach ->
-      @value += 20
+      @value.push('two')
 
   afterEach ->
     afterEachCount += 1

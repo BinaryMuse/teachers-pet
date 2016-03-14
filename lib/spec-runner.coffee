@@ -26,9 +26,9 @@ class SpecRunner
 
     spec.ran = true
     try
-      @runHooks(spec, 'beforeEach', userEnv)
+      @runHooks(spec.suite, 'beforeEach', userEnv)
       spec.itFn.call(userEnv)
-      @runHooks(spec, 'afterEach', userEnv)
+      @runHooks(spec.suite, 'afterEach', userEnv)
 
       spec.pass()
       @executeSafe => @options.onSpecPass?(spec)
@@ -37,16 +37,10 @@ class SpecRunner
       spec.fail(ex)
       @executeSafe => @options.onSpecFail?(spec)
 
-  runHooks: (spec, hookType, userEnv) ->
-    hooks = []
-    suite = spec.suite
-    while suite?
-      for hook in suite.hooks[hookType]
-        hooks.unshift(hook)
-      suite = suite.parentSuite
-
-    for hook in hooks
-      hook.call(userEnv)
+  runHooks: (suite, hookType, userEnv) ->
+    if suite.parentSuite?
+      @runHooks suite.parentSuite, hookType, userEnv
+    hook.call(userEnv) for hook in suite.hooks[hookType]
 
   executeSafe: (fn) ->
     try
