@@ -17,12 +17,15 @@ describe 'Basic tests', ->
   it 'allows setting on the user env', ->
     assert.equal @value, 10
 
-  describe 'nested tests\' beforeEach\'s', ->
+  describe 'nested tests\' (multiple) beforeEach\'s', ->
+    it 'works as expected', ->
+      assert.equal @value, 40
+
     beforeEach ->
       @value += 10
 
-    it 'works as expected', ->
-      assert.equal @value, 20
+    beforeEach ->
+      @value += 20
 
   afterEach ->
     afterEachCount += 1
@@ -38,6 +41,9 @@ describe 'Other things', ->
     assert.equal beforeEachCount, 4
     assert.equal afterEachCount, 4
 
+  describe 'an it with no callback', ->
+    it 'is marked as pending'
+
   describe 'in nested describes', ->
     it 'reports failures at the right indent (this should fail)', ->
       assert.equal 'yep', 'nope'
@@ -49,7 +55,11 @@ describe 'Other things', ->
   xdescribe 'xdescribes', ->
     it 'reports sub specs as pending', ->
       console.log "RUNNING THE XDESC"
+
     it 'reports multiple sub specs as pending', ->
+
+    describe 'even in non-xdescribe children', ->
+      it 'they are still pending', ->
 
   describe 'xits', ->
     xit 'marks a spec as pending', ->

@@ -23,45 +23,15 @@ class SpecReporter
     @reportCounts()
     console.log ''
     console.log ''
-    @reportSuite -1, env.rootSuite
-    console.log ''
-    console.log ''
     @summarizeFailures()
 
     if @failures.length then 1 else 0
 
-  reportSuite: (level, suite) ->
-    if suite.parentSuite
-      writeSpaces level, 2
-      console.log suite.description
-
-    wroteNewline = false
-    for spec in suite.specs
-      @reportSpec spec, level
-    for subSuite in suite.subSuites
-      @reportSuite level + 1, subSuite
-
-  reportSpec: (spec, indent = 0) ->
-    writeSpaces indent + 1, 2
-    color = (str) -> str
-
-    if not spec.ran
-      color = colors.yellow
-      process.stdout.write "-".yellow.bold
-    else if spec.failed
-      color = colors.red
-      process.stdout.write "\u2717".red.bold
-    else
-      color = colors.green
-      process.stdout.write "\u2713".green.bold
-
-    process.stdout.write color(" #{spec.description}\n")
-
   reportCounts: ->
-    process.stdout.write "#{@specCount} specs, "
-    process.stdout.write "#{@passCount} passed, "
-    process.stdout.write "#{@failures.length} failed, "
-    process.stdout.write "#{@pendingCount} pending"
+    process.stdout.write " #{@specCount} specs,"
+    process.stdout.write " #{@passCount} passed,"
+    process.stdout.write " #{@failures.length} failed,"
+    process.stdout.write " #{@pendingCount} pending"
 
   summarizeFailures: ->
     @summarizeFailure(failure) for failure in @failures

@@ -17,7 +17,7 @@ class SpecRunner
     @runSuite sub, copyEnv() for sub in suite.subSuites
 
   runSpec: (spec, userEnv) ->
-    if spec.pending
+    if spec.isPending()
       spec.skip()
       try
         @options.onSpecPending?(spec)

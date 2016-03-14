@@ -3,9 +3,9 @@ path = require 'path'
 vm = require 'vm'
 
 coffee = require 'coffee-script'
+yargs = require 'yargs'
 
 SpecEnvironment = require './spec-environment'
-SpecReporter = require './spec-reporter'
 SpecRunner = require './spec-runner'
 
 loadSpecFile = (specFile, vmContext) ->
@@ -34,14 +34,21 @@ createContext = (env) ->
     afterEach: env.afterEach
   vm.createContext safeContext
 
+getReporterByName = (name = "default") ->
+  file = path.join(__dirname, 'reporters', "#{name}-reporter")
+  require file
 
 
 
-specFiles = process.argv[2...]
+argv = yargs.argv
+specFiles = argv._
+reporter = argv.reporter
+
 if not specFiles.length
   console.error "No spec files specified"
   process.exit 1
 
+SpecReporter = getReporterByName argv.reporter
 reporter = new SpecReporter()
 env = new SpecEnvironment(reporter)
 runner = new SpecRunner(env)

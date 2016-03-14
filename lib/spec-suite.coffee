@@ -2,7 +2,7 @@ Spec = require './spec'
 
 module.exports =
 class SpecSuite
-  constructor: (@env, @description, @parentSuite, @pending) ->
+  constructor: (@env, @description, @parentSuite, @options={}) ->
     @hooks =
       before: []
       beforeEach: []
@@ -11,16 +11,19 @@ class SpecSuite
     @specs = []
     @subSuites = []
 
-  describe: (description, subSuiteFn, pending=false) ->
-    subSuite = new SpecSuite(@env, description, this, pending)
+  isPending: ->
+    @options.pending or @parentSuite?.isPending()
+
+  describe: (description, subSuiteFn, options={}) ->
+    subSuite = new SpecSuite(@env, description, this, options)
     @subSuites.push(subSuite)
     subSuite
 
   xdescribe: (args...) ->
     @describe(args...)
 
-  it: (description, itFn, pending=false) =>
-    spec = new Spec(description, itFn, this, pending or @pending)
+  it: (description, itFn, options={}) =>
+    spec = new Spec(description, itFn, this, options)
     @specs.push(spec)
     spec
 
