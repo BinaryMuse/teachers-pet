@@ -30,6 +30,29 @@ Supports JS and CoffeeScript out of the box.
 Spec Descriptions
 -----------------
 
+Example:
+
+```coffee-script
+assert = require 'assert'
+
+describe 'Basic tests', ->
+  beforeEach ->
+    doThing()
+
+  afterEach ->
+    tearDownThing()
+
+  it 'tests equality', ->
+    assert.equal 1, 1
+
+  it 'tests async', (done) ->
+    setTimeout done, 200
+
+  it 'tests async with promises', ->
+    return new Promise (resolve, reject) ->
+      setTimeout resolve, 200
+```
+
 The following functions are made available globally:
 
 * `describe` - set up context, useful for describing a group of tests or making them share `beforeEach`/`afterEach` hooks
@@ -43,20 +66,6 @@ The following functions are made available globally:
 
 The functions passed to `beforeEach`, `afterEach`, and `it` blocks may take an optional `done` parameter; if the function takes such a parameter, the test is marked as async, and the done parameter *must* be called with a falsy value in order for the test to continue.
 
-Both `describe` and `it` blocks can take an optional parameter after the description (before the callback) specifying certain options. Right now, the following are supported
+Both `describe` and `it` blocks can take an optional parameter after the description (before the callback) specifying certain options. Right now, the following are supported:
 
 * `async: ms` - set the number of milliseconds the test runner will wait for the callback to be called
-
-```coffee-script
-assert = require 'assert'
-
-describe 'Basic tests', ->
-  beforeEach ->
-    doThing()
-
-  it 'tests equality', ->
-    assert.equal 1, 1
-
-  afterEach ->
-    tearDownThing()
-```
