@@ -19,10 +19,8 @@ class SpecRunner
   runSpec: (spec, userEnv) ->
     if spec.isPending()
       spec.skip()
-      try
-        @options.onSpecPending?(spec)
-      finally
-        return
+      @executeSafe -> @options.onSpecPending?(spec)
+      return
 
     spec.ran = true
     try
@@ -43,7 +41,4 @@ class SpecRunner
     hook.call(userEnv) for hook in suite.hooks[hookType]
 
   executeSafe: (fn) ->
-    try
-      fn()
-    finally
-      # nothing
+    try fn()
