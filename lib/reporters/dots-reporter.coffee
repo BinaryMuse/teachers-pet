@@ -44,9 +44,10 @@ class SpecReporter
       suite = suite.parentSuite
 
     console.log ' ', desc.red
-    lines = spec.exception.stack.split("\n")
+    lines = spec.exception.stack.trim().split("\n")
     for line in lines
       console.log '  ', line
+    console.log ''
 
   onSpecPending: =>
     @specCount += 1
