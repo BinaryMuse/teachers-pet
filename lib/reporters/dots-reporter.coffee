@@ -44,7 +44,8 @@ class SpecReporter
       suite = suite.parentSuite
 
     console.log ' ', desc.red
-    lines = spec.exception.stack.trim().split("\n")
+    msg = spec.exception.stack ? spec.exception.message ? spec.exception
+    lines = msg.trim().split("\n")
     for line in lines
       console.log '  ', line
     console.log ''

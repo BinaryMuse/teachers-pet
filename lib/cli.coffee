@@ -1,3 +1,4 @@
+{Buffer} = require 'buffer'
 fs = require 'fs'
 path = require 'path'
 vm = require 'vm'
@@ -12,7 +13,10 @@ loadSpecFile = (specFile, vmContext) ->
   filePath = path.resolve(specFile)
   code = fs.readFileSync(filePath, 'utf8')
   if path.extname(specFile) is ".coffee"
-    code = coffee.compile(code)
+    {js, v3SourceMap} = coffee.compile(code, sourceMap: true)
+    b64 = new Buffer(v3SourceMap).toString('base64')
+    uri = "data:application/json;charset=utf-8;base64,#{b64}"
+    code = "#{js}\n//@ sourceMappingURL=#{uri}"
   script = new vm.Script(code, filename: specFile)
   script.runInContext vmContext
 
@@ -43,6 +47,7 @@ getReporterByName = (name = "default") ->
 argv = yargs.argv
 specFiles = argv._
 reporter = argv.reporter
+asyncTimeout = argv.asyncTimeout
 
 if not specFiles.length
   console.error "No spec files specified"
@@ -50,15 +55,15 @@ if not specFiles.length
 
 SpecReporter = getReporterByName argv.reporter
 reporter = new SpecReporter()
-env = new SpecEnvironment(reporter)
+env = new SpecEnvironment(reporter, asyncTimeout: asyncTimeout)
 runner = new SpecRunner(env)
 context = createContext(env)
 loadSpecFile spec, context for spec in specFiles
-exitCode = runner.run
+runOptions =
   onSpecPending: reporter.onSpecPending
   onSpecPass: reporter.onSpecPass
   onSpecFail: reporter.onSpecFail
-
-reporter.report(env)
-
-process.exit(exitCode)
+runner.run(runOptions)
+  .then (code) ->
+    reporter.report(env)
+    process.exit(code)

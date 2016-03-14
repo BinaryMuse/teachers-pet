@@ -12,8 +12,18 @@ After cloning:
 
 ```
 $ npm install
-$ ./bin/tpet path/to/tests.ext
+$ ./bin/tpet [options] [tests...]
 ```
+
+`options` can be:
+
+* `--reporter reporter` (where `reporter` is `bdd` or `dots`) - specify the reporter to use to summarize the test run
+* `--async-timeout time` (where `time` is a number in milliseconds) - change the amount of time that the test runner waits before assuming an async test has failed; you can modify this on an individual `describe` or `it` basis by passing an option, e.g.
+
+  ```coffeescript
+  it 'waits longer than normal', timeout: 60000, (done) ->
+    # ...
+  ```
 
 Supports JS and CoffeeScript out of the box.
 
@@ -29,7 +39,13 @@ The following functions are made available globally:
 * `beforeEach` - run some code before each test
 * `afterEach` - run some code after each test
 
-`describe` blocks can be nested inside each other; all the hooks defined in any parent `describe`s are ran in order.
+`describe` blocks can be nested inside each other; all the hooks defined in any parent `describe`s are ran in definition order.
+
+The functions passed to `beforeEach`, `afterEach`, and `it` blocks may take an optional `done` parameter; if the function takes such a parameter, the test is marked as async, and the done parameter *must* be called with a falsy value in order for the test to continue.
+
+Both `describe` and `it` blocks can take an optional parameter after the description (before the callback) specifying certain options. Right now, the following are supported
+
+* `async: ms` - set the number of milliseconds the test runner will wait for the callback to be called
 
 ```coffee-script
 assert = require 'assert'

@@ -71,3 +71,55 @@ describe 'Other things', ->
     xit 'marks a spec as pending', ->
 
     it 'allows other specs at the same level to run', ->
+
+  describe 'async testing', ->
+    beforeEach (done) ->
+      setTimeout =>
+        @val = 100
+        done()
+      , 200
+
+    it 'waits for async hooks', ->
+      assert.equal @val, 100
+
+    it 'works', (done) ->
+      setTimeout done, 200
+
+    it 'times out (this should fail)', (done) ->
+      setTimeout done, 1200
+
+    it 'allows overriding the timeout', timeout: 1500, (done) ->
+      setTimeout done, 1200
+
+    it 'fails when passing a value to done (this should fail)', (done) ->
+      setTimeout (-> done(new Error('omg'))), 100
+
+    it 'waits for a promise', ->
+      return new Promise (res, rej) ->
+        setTimeout (-> res()), 200
+
+    it 'fails when a promise is rejected (this should fail)', ->
+      try
+        return new Promise (res, rej) ->
+          throw new Error("thrown from promise")
+      catch e
+        console.log "I got a thing!"
+
+    # It seems Node hooks into setTimeout (and others) to catch exceptions
+    # thrown and turns them into uncaughtException events on `process`. However,
+    # we can't assume that such evets came from the spec, as they might have
+    # come from other background timers. Domains might be an answer, but they
+    # are fully deprecated according to the docs. Just commenting this out for now.
+    #
+    # it 'fails when a promise is rejected (this should fail 2)', ->
+    #   try
+    #     return new Promise (res, rej) ->
+    #       setTimeout ->
+    #         throw new Error("thrown from promise 2")
+    #       , 200
+    #   catch e
+    #     console.log "I got a thing!"
+
+    it 'only waits the timeout to pass with promises (this should fail)', ->
+      return new Promise (res, rej) ->
+        setTimeout (-> res()), 1200

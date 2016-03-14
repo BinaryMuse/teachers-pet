@@ -18,7 +18,7 @@ class SpecReporter
     @failures = []
 
   report: (env) ->
-    @reportSuite -1, env.rootSuite
+    @reportSuite env.rootSuite
     console.log ''
     @reportCounts()
     console.log ''
@@ -27,30 +27,32 @@ class SpecReporter
 
     if @failures.length then 1 else 0
 
-  reportSuite: (level, suite) ->
+  reportSuite: (suite, level = -1) ->
+    # don't output the name of the root suite
     if suite.parentSuite
       writeSpaces level, 2
       console.log suite.description
 
-    wroteNewline = false
     for spec in suite.specs
       @reportSpec spec, level
     for subSuite in suite.subSuites
-      @reportSuite level + 1, subSuite
+      @reportSuite subSuite, level + 1
 
   reportSpec: (spec, indent = 0) ->
     writeSpaces indent + 1, 2
     color = (str) -> str
 
-    if not spec.ran
+    if spec.skipped
       color = colors.yellow
       process.stdout.write "-".yellow.bold
     else if spec.failed
       color = colors.red
       process.stdout.write "\u2717".red.bold
-    else
+    else if spec.passed
       color = colors.green
       process.stdout.write "\u2713".green.bold
+    else
+      process.stdout.write "?"
 
     process.stdout.write color(" #{spec.description}\n")
 
@@ -71,7 +73,8 @@ class SpecReporter
       suite = suite.parentSuite
 
     console.log ' ', desc.red
-    lines = spec.exception.stack.trim().split("\n")
+    msg = spec.exception.stack ? spec.exception.message ? spec.exception
+    lines = msg.trim().split("\n")
     for line in lines
       console.log '  ', line
     console.log ''
