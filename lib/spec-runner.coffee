@@ -5,9 +5,8 @@ class SpecRunner
     @options = {}
 
   run: (@options) ->
-    suite = @env.rootSuite
-    userEnv = @env.userEnv
-    @runSuite(suite, userEnv)
+    {rootSuite, userEnv} = @env
+    @runSuite(rootSuite, userEnv)
 
     if @anyFailed then 1 else 0
 
@@ -22,7 +21,6 @@ class SpecRunner
       @executeSafe -> @options.onSpecPending?(spec)
       return
 
-    spec.ran = true
     try
       @runHooks(spec.suite, 'beforeEach', userEnv)
       spec.itFn.call(userEnv)
