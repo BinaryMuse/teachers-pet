@@ -12,13 +12,13 @@ writeSpaces = (num, per = 1) ->
 module.exports =
 class SpecReporter
   constructor: ->
+    @level = -1
     @specCount = 0
     @passCount = 0
     @pendingCount = 0
     @failures = []
 
   report: (env) ->
-    @reportSuite env.rootSuite
     console.log ''
     @reportCounts()
     console.log ''
@@ -27,40 +27,11 @@ class SpecReporter
 
     if @failures.length then 1 else 0
 
-  reportSuite: (suite, level = -1) ->
-    # don't output the name of the root suite
-    if suite.parentSuite
-      writeSpaces level, 2
-      console.log suite.description
-
-    for spec in suite.specs
-      @reportSpec spec, level
-    for subSuite in suite.subSuites
-      @reportSuite subSuite, level + 1
-
-  reportSpec: (spec, indent = 0) ->
-    writeSpaces indent + 1, 2
-    color = (str) -> str
-
-    if spec.skipped
-      color = colors.yellow
-      process.stdout.write "-".yellow.bold
-    else if spec.failed
-      color = colors.red
-      process.stdout.write "\u2717".red.bold
-    else if spec.passed
-      color = colors.green
-      process.stdout.write "\u2713".green.bold
-    else
-      process.stdout.write "?"
-
-    process.stdout.write color(" #{spec.description}\n")
-
   reportCounts: ->
     process.stdout.write " #{@specCount} specs,"
     process.stdout.write " #{@passCount} passed,"
     process.stdout.write " #{@failures.length} failed,"
-    process.stdout.write " #{@pendingCount} pendin"
+    process.stdout.write " #{@pendingCount} pending"
 
   summarizeFailures: ->
     @summarizeFailure(failure) for failure in @failures
@@ -79,14 +50,40 @@ class SpecReporter
       console.log '  ', line
     console.log ''
 
-  onSpecPending: =>
-    @specCount += 1
-    @pendingCount += 1
+  onSuiteStart: (suite) =>
+    # don't output the name of the root suite
+    if suite.parentSuite
+      @level += 1
+      writeSpaces @level, 2
+      console.log suite.description
 
-  onSpecPass: =>
-    @specCount += 1
-    @passCount += 1
+  onSuiteEnd: (suite) =>
+    @level -= 1
 
-  onSpecFail: (spec) =>
+  onSpecStart: (spec) =>
+    writeSpaces @level + 1, 2
+    process.stdout.write "  #{spec.description}"
+
+  onSpecEnd: (spec, status) =>
     @specCount += 1
-    @failures.push spec
+    color = (str) -> str
+
+    process.stdout.clearLine()
+    process.stdout.cursorTo(0)
+    writeSpaces @level + 1, 2
+    if status is "pass"
+      color = colors.green
+      @passCount += 1
+      process.stdout.write "\u2713".green.bold
+    else if status is "skip"
+      color = colors.yellow
+      @pendingCount += 1
+      process.stdout.write "-".yellow.bold
+    else if status is "fail"
+      color = colors.red
+      @failures.push(spec)
+      process.stdout.write "\u2717".red.bold
+    else
+      process.stdout.write '?'
+    process.stdout.write color(" #{spec.description}")
+    console.log ''

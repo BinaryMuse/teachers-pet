@@ -34,45 +34,55 @@ class SpecRunner
   runSuite: (suite, userEnv) ->
     copyEnv = -> Object.assign({}, userEnv)
 
+    onSuiteStart = =>
+      @options.onSuiteStart?(suite)
+    onSuiteEnd = =>
+      @options.onSuiteEnd?(suite)
+
     p = Promise.resolve()
+    p = p.then(onSuiteStart)
     for spec in suite.specs
       do (spec) =>
         next = () => @runSpec(spec, copyEnv())
         p = p.then(next, next)
-    for suite in suite.subSuites
-      do (suite) =>
-        next = () => @runSuite(suite, copyEnv())
+    for sub in suite.subSuites
+      do (sub) =>
+        next = () => @runSuite(sub, copyEnv())
         p = p.then(next, next)
+    p = p.then(onSuiteEnd, onSuiteEnd)
 
     p
 
   runSpec: (spec, userEnv) ->
+    @options.onSpecStart?(spec)
+
     if spec.isPending()
       spec.skip()
-      @options.onSpecPending?(spec)
+      @options.onSpecEnd?(spec, "skip")
       return null
 
     specPassed = =>
       spec.pass()
-      @options.onSpecPass?(spec)
+      @options.onSpecEnd?(spec, "pass")
       null
 
     specFailed = (ex) =>
       @anyFailed = true
       spec.fail(ex)
-      @options.onSpecFail?(spec)
+      @options.onSpecEnd?(spec, "fail")
       null
 
     timeout = spec.userOptions.timeout ? @env.options.asyncTimeout
     specResultPromise = Promise.resolve()
-      .then => @runHooks(spec.suite, 'beforeEach', userEnv, timeout)
+      .then => @runHooks(spec, 'beforeEach', userEnv, timeout)
       .then => @executeAsyncSpecFn(spec.itFn, userEnv, timeout)
-      .then => @runHooks(spec.suite, 'afterEach', userEnv, timeout)
+      .then => @runHooks(spec, 'afterEach', userEnv, timeout)
 
     specResultPromise
       .then(specPassed, specFailed)
 
-  runHooks: (suite, hookType, userEnv, timeout) ->
+  runHooks: (spec, hookType, userEnv, timeout) ->
+    suite = spec.suite
     parents = [suite]
     while suite.parentSuite?
       parents.unshift suite.parentSuite
@@ -83,7 +93,7 @@ class SpecRunner
     p = Promise.resolve()
     for hook in hooks
       do (hook) =>
-        p = p.then(=> @executeAsyncSpecFn(hook, userEnv, timeout))
+        p = p.then => @executeAsyncSpecFn(hook, userEnv, timeout)
     p
 
   executeAsyncSpecFn: (fn, userEnv, timeout) ->

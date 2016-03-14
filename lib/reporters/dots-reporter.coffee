@@ -50,17 +50,19 @@ class SpecReporter
       console.log '  ', line
     console.log ''
 
-  onSpecPending: =>
-    @specCount += 1
-    @pendingCount += 1
-    process.stdout.write '-'.yellow
+  onSuiteStart: (suite) =>
+  onSuiteEnd: (suite) =>
 
-  onSpecPass: =>
+  onSpecEnd: (spec, status) =>
     @specCount += 1
-    @passCount += 1
-    process.stdout.write '.'.green
-
-  onSpecFail: (spec) =>
-    @specCount += 1
-    @failures.push spec
-    process.stdout.write 'F'.red
+    if status is "pass"
+      @passCount += 1
+      process.stdout.write '.'.green
+    else if status is "skip"
+      @pendingCount += 1
+      process.stdout.write '-'.yellow
+    else if status is "fail"
+      @failures.push(spec)
+      process.stdout.write 'F'.red
+    else
+      process.stdout.write '?'

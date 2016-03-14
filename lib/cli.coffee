@@ -60,9 +60,10 @@ runner = new SpecRunner(env)
 context = createContext(env)
 loadSpecFile spec, context for spec in specFiles
 runOptions =
-  onSpecPending: reporter.onSpecPending
-  onSpecPass: reporter.onSpecPass
-  onSpecFail: reporter.onSpecFail
+  onSuiteStart: reporter.onSuiteStart
+  onSuiteEnd: reporter.onSuiteEnd
+  onSpecStart: reporter.onSpecStart
+  onSpecEnd: reporter.onSpecEnd
 runner.run(runOptions)
   .then (code) ->
     reporter.report(env)
