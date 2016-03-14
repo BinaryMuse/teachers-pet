@@ -41,6 +41,12 @@ describe 'Other things', ->
     assert.equal beforeEachCount, 4
     assert.equal afterEachCount, 4
 
+  describe 'hooks with errors', ->
+    beforeEach ->
+      throw new Error('Purposeful beforeEach error')
+
+    it 'makes the associated tests fail (this should fail)', ->
+
   describe 'an it with no callback', ->
     it 'is marked as pending'
 
