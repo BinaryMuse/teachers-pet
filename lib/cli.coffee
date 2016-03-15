@@ -25,17 +25,15 @@ createContext = (env) ->
   newModule =
     exports: newExports
 
-  safeContext = Object.assign {}, global,
+  envApi = SpecEnvironment.publicMethods.reduce (acc, item) ->
+    acc[item] = env[item]
+    acc
+  , {}
+
+  safeContext = Object.assign {}, global, envApi,
     require: require,
     exports: newExports,
     module: newModule,
-
-    describe: env.describe
-    xdescribe: env.xdescribe
-    it: env.it
-    xit: env.xit
-    beforeEach: env.beforeEach
-    afterEach: env.afterEach
   vm.createContext safeContext
 
 getReporterByName = (name = "default") ->

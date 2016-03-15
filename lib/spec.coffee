@@ -6,9 +6,10 @@ class Spec
     @failed = false
     @passed = false
     @exception = null
+    @focusLevel = @options.focusLevel ? 0
 
   isPending: ->
-    @options.pending or @suite.isPending()
+    @options.pending or @suite.isPending() or @focusLevel < @suite.env.maxFocusLevel
 
   pass: ->
     @ran = true

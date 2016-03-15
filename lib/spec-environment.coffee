@@ -6,9 +6,12 @@ class SpecEnvironment
     @options =
       asyncTimeout: @options.asyncTimeout ? 1000
     @userEnv = {}
-    @highestFocusLevel = 0
+    @maxFocusLevel = 0
     @rootSuite = new SpecSuite(this, '<root>')
     @suiteStack = [@rootSuite]
+
+    for methodName in SpecEnvironment.publicMethods
+      this[methodName] = this[methodName].bind(this)
 
   currentSuite: =>
     @suiteStack[@suiteStack.length - 1]
@@ -56,3 +59,21 @@ class SpecEnvironment
 
   afterEach: (afterFn) =>
     @currentSuite().afterEach afterFn
+
+SpecEnvironment.publicMethods = [
+  'describe', 'xdescribe', 'it', 'xit',
+  'beforeEach', 'afterEach'
+]
+
+for baseMethodName in ["describe", "it"]
+  for i in [1..6]
+    do (baseMethodName, i) ->
+      effs = "f".repeat(i)
+      methodName = "#{effs}#{baseMethodName}"
+      SpecEnvironment.prototype[methodName] = (desc, userOpt, subFn) ->
+        @maxFocusLevel = Math.max @maxFocusLevel, i
+        if baseMethodName is 'describe'
+          @createDescribe desc, userOpt, subFn, focusLevel: i
+        else if baseMethodName is 'it'
+          @createIt desc, userOpt, subFn, focusLevel: i
+      SpecEnvironment.publicMethods.push(methodName)
