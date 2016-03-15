@@ -3,6 +3,7 @@ SpecSuite = require './spec-suite'
 module.exports =
 class SpecEnvironment
   constructor: (@reporter, @options={}) ->
+    @running = false
     @options =
       asyncTimeout: @options.asyncTimeout ? 1000
     @userEnv = {}
@@ -29,6 +30,7 @@ class SpecEnvironment
     @createDescribe description, userOptions, subSuiteFn, pending: true
 
   createDescribe: (description, userOptions, subSuiteFn, options={}) ->
+    throw new Error("Cannot define new describes while suite is running") if @running
     if not subSuiteFn?
       subSuiteFn = userOptions
       userOptions = {}
@@ -45,6 +47,7 @@ class SpecEnvironment
     @createIt description, userOptions, itFn, pending: true
 
   createIt: (description, userOptions, itFn, options={}) =>
+    throw new Error("Cannot define new its while suite is running") if @running
     if not itFn?
       itFn = userOptions
       userOptions = {}

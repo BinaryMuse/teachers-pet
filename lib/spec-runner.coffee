@@ -13,13 +13,16 @@ class SpecRunner
 
   run: (@options) ->
     {rootSuite, userEnv} = @env
+    @env.running = true
     @installUncaughtHandler()
     @runSuite rootSuite, userEnv
-      .then @uninstallUncaughtHandler
-      .then => if @anyFailed then 1 else 0
       .catch (err) ->
         console.error "Spec run failed (promise was rejected):"
         console.error err.stack ? err
+        @anyFailed = true
+      .then => @uninstallUncaughtHandler()
+      .then => @env.running = false
+      .then => if @anyFailed then 1 else 0
 
   installUncaughtHandler: =>
     process.on 'uncaughtException', @handleUncaughtException
