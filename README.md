@@ -1,5 +1,5 @@
-Teacher's Pet
-=============
+Teacher's Pet 🍎
+===============
 
 > A library for passing all the tests
 
