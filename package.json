@@ -1,7 +1,7 @@
 {
   "name": "teachers-pet",
   "version": "1.0.0",
-  "description": "A toy testing framework for learning",
+  "description": "A toy testing framework for learning how to build testing frameworks",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

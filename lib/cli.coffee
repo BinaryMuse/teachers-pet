@@ -42,7 +42,20 @@ getReporterByName = (name = "default") ->
 
 
 
-argv = yargs.argv
+argv = yargs
+  .usage('Usage: $0 [options] [test files...]')
+  .alias('t', 'async-timeout')
+  .nargs('t', 1)
+  .default('t', 1000)
+  .describe('t', 'how long to wait (in ms) for async tests to finish')
+  .alias('o', 'reporter')
+  .choices('o', ['dots', 'bdd'])
+  .default('o', 'dots')
+  .describe('o', 'which test reporter to use')
+  .help('h')
+  .alias('h', 'help')
+  .argv
+
 specFiles = argv._
 reporter = argv.reporter
 asyncTimeout = argv.asyncTimeout
