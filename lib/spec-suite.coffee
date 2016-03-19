@@ -2,6 +2,10 @@ Spec = require './spec'
 
 module.exports =
 class SpecSuite
+  # SpecSuite represents a single `describe` from a user spec. Every `SpecEnvironment`
+  # has at least one (the environment's root SpecSuite). SpecSuite contains all
+  # the methods required to define sub-suites or child specs (via `describe` and `it`,
+  # respectivel) as well as all the hook information.
   constructor: (@env, @description, @parentSuite, @userOptions, @options={}) ->
     @hooks =
       before: []

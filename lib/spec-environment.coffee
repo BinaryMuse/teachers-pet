@@ -2,6 +2,18 @@ SpecSuite = require './spec-suite'
 
 module.exports =
 class SpecEnvironment
+  # A SpecEnvironment is a store for all the data associated with a given
+  # spec run. Most notably, before a run starts, it stores the root
+  # SpecSuite and keeps track of the "current" SpecSuite as `createDescribe`
+  # recurses into nested `describe`s, which is necessary for the global `describe`,
+  # `it`, and related functions to use to attach data at the right nesting level.
+  #
+  # Creating a SpecEnvironment creates a root SpecSuite automatically, so users
+  # can use `it`, etc. right away without defining a `describe`.
+  #
+  # Finally, SpecEnvironment has a key called `publicMethods` that specifies
+  # a list of method names corresponding to methods on the environment that
+  # are allowed to be exported as globals for specs to use.
   constructor: (@reporter, @options={}) ->
     @running = false
     @options =

@@ -1,5 +1,7 @@
 module.exports =
 class Spec
+  # A Spec represents a single test from a user spec. It has a reference to its
+  # parent SpecSuite.
   constructor: (@description, @itFn, @suite, @userOptions, @options={}) ->
     @ran = false
     @skipped = false
