@@ -25,6 +25,7 @@ Options:
                                                                  [default: 1000]
   -o, --reporter       which test reporter to use
                                       [choices: "dots", "bdd"] [default: "dots"]
+  --no-color           disable color output
   -h, --help           Show help                                       [boolean]
 ```
 

@@ -52,6 +52,7 @@ argv = yargs
   .choices('o', ['dots', 'bdd'])
   .default('o', 'dots')
   .describe('o', 'which test reporter to use')
+  .describe('no-color', 'disable color output')
   .help('h')
   .alias('h', 'help')
   .argv
