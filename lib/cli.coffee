@@ -13,6 +13,9 @@ loadSpecFile = (specFile, vmContext) ->
   filePath = path.resolve(specFile)
   code = fs.readFileSync(filePath, 'utf8')
   if path.extname(specFile) is ".coffee"
+    # If we're running CoffeeScript specs, we need to compile
+    # them first. We also want to embed the source map so
+    # errors point to the right CS source line.
     {js, v3SourceMap} = coffee.compile(code, sourceMap: true)
     b64 = new Buffer(v3SourceMap).toString('base64')
     uri = "data:application/json;charset=utf-8;base64,#{b64}"
@@ -25,10 +28,8 @@ createContext = (env) ->
   newModule =
     exports: newExports
 
-  envApi = SpecEnvironment.publicMethods.reduce (acc, item) ->
-    acc[item] = env[item]
-    acc
-  , {}
+  envApi = {}
+  envApi[item] = env[item] for item in SpecEnvironment.publicMethods
 
   safeContext = Object.assign {}, global, envApi,
     require: require,
